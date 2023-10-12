@@ -6,9 +6,9 @@ import (
 )
 
 type Addition struct {
+	driver.RootPath
 	Address string `json:"Address" required:"true"`
 	Cookies string `json:"Cookies" required:"true"`
-	driver.RootPath
 }
 
 var config = driver.Config{

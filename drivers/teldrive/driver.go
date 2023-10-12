@@ -1,14 +1,22 @@
 package teldrive
 
 import (
+	"bufio"
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
+	"math"
 	"net/http"
+	"strconv"
 
 	"github.com/alist-org/alist/v3/internal/driver"
 	"github.com/alist-org/alist/v3/internal/errs"
 	"github.com/alist-org/alist/v3/internal/model"
+	"github.com/alist-org/alist/v3/pkg/utils"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -229,7 +237,142 @@ func (d *Teldrive) Remove(ctx context.Context, obj model.Obj) error {
 }
 
 func (d *Teldrive) Put(ctx context.Context, dstDir model.Obj, stream model.FileStreamer, up driver.UpdateProgress) error {
-	return errs.NotImplement
+	fileSize := stream.GetSize()
+	fileName := stream.GetName()
+	input := fmt.Sprintf("%s:%s:%d", fileName, dstDir, fileSize)
+
+	hash := md5.Sum([]byte(input))
+	hashString := hex.EncodeToString(hash[:])
+
+	uploadURL := fmt.Sprintf("/api/uploads/%s", hashString)
+
+	url := d.Addition.Address + uploadURL
+	method := "POST"
+
+	var uploadFile UploadFile
+	var uploadedSize int64 = 0
+
+	if len(uploadFile.Parts) != 0 {
+		for _, part := range uploadFile.Parts {
+			uploadedSize += part.Size
+		}
+	}
+
+	client := resty.New()
+
+	utils.Log.Info(uploadedSize)
+	utils.Log.Info(stream.GetSize())
+	if uploadedSize != stream.GetSize() {
+
+		in := bufio.NewReader(stream)
+
+		if uploadedSize > 0 {
+			io.CopyN(io.Discard, in, uploadedSize)
+		}
+
+		left := stream.GetSize() - uploadedSize
+
+		partNo := 1
+
+		if len(uploadFile.Parts) > 0 {
+			partNo = len(uploadFile.Parts) + 1
+		}
+
+		totalParts := int(math.Ceil(float64(stream.GetSize()) / float64(1024*1024*1024)))
+
+		for {
+
+			if _, err := in.Peek(1); err != nil {
+				if left > 0 {
+					return err
+				}
+				break
+			}
+			n := int64(1024 * 1024 * 1024)
+			if stream.GetSize() != -1 {
+				n = d.int64min(left, n)
+				left -= n
+			}
+			partReader := io.LimitReader(in, n)
+
+			name := fmt.Sprintf("%s.part.%03d", stream.GetName(), partNo)
+			resp, err := client.R().
+				SetHeader("Content-Type", "application/octet-stream").
+				SetHeader("Cookie", "user-session="+d.Addition.Cookies).
+				SetHeader("Accept-Language", "en-US,en;q=0.9").
+				SetHeader("Connection", "keep-alive").
+				SetBody(partReader).
+				SetHeader("Content-Length", strconv.FormatInt(n, 10)).
+				SetQueryParams(map[string]string{
+					"fileName":   name,
+					"partNo":     strconv.Itoa(partNo),
+					"totalparts": strconv.FormatInt(int64(totalParts), 10),
+				}).
+				Execute(method, url)
+
+			utils.Log.Info(resp.String())
+			if err != nil {
+				return err
+			}
+			if resp.StatusCode() != http.StatusOK {
+				return errors.New(resp.String())
+			}
+			var response PartFile
+			err = json.Unmarshal(resp.Body(), &response)
+			if err != nil {
+				return err
+			}
+
+			uploadFile.Parts = append(uploadFile.Parts, response)
+			partNo++
+		}
+	}
+
+	fileParts := []FilePart{}
+
+	for _, part := range uploadFile.Parts {
+		fileParts = append(fileParts, FilePart{ID: part.PartId})
+	}
+
+	// upload
+	payload := FileUploadRequest{
+		Name:     stream.GetName(),
+		MimeType: stream.GetMimetype(),
+		Type:     "file",
+		Parts:    fileParts,
+		Size:     int(stream.GetSize()),
+		Path:     dstDir.GetPath(),
+	}
+	resp_file, err := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetHeader("Cookie", "user-session="+d.Addition.Cookies).
+		SetHeader("Accept-Language", "en-US,en;q=0.9").
+		SetHeader("Connection", "keep-alive").
+		SetBody(payload).
+		Execute(method, d.Addition.Address+"/api/files")
+
+	if err != nil {
+		return err
+	}
+	if resp_file.StatusCode() != http.StatusOK {
+		return errors.New(resp_file.String())
+	}
+	utils.Log.Info(resp_file.String())
+
+	resp_del_temp, err := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetHeader("Cookie", "user-session="+d.Addition.Cookies).
+		SetHeader("Accept-Language", "en-US,en;q=0.9").
+		SetHeader("Connection", "keep-alive").
+		Execute("DELETE", d.Addition.Address+"/api/uploads/"+hashString)
+	if err != nil {
+		return err
+	}
+	if resp_del_temp.StatusCode() != http.StatusOK {
+		return errors.New(resp_del_temp.String())
+	}
+
+	return nil
 }
 
 var _ driver.Driver = (*Teldrive)(nil)

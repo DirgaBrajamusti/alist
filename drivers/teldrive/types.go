@@ -24,3 +24,28 @@ type File struct {
 type FileList struct {
 	Results []File `json:"results"`
 }
+
+// For Uploading
+type PartFile struct {
+	Name       string `json:"name"`
+	PartId     int    `json:"partId"`
+	PartNo     int    `json:"partNo"`
+	TotalParts int    `json:"totalParts"`
+	Size       int64  `json:"size"`
+}
+type UploadFile struct {
+	Parts []PartFile `json:"parts,omitempty"`
+}
+
+type FilePart struct {
+	ID int `json:"id"`
+}
+
+type FileUploadRequest struct {
+	Name     string     `json:"name"`
+	MimeType string     `json:"mimeType"`
+	Type     string     `json:"type"`
+	Parts    []FilePart `json:"parts"`
+	Size     int        `json:"size"`
+	Path     string     `json:"path"`
+}
