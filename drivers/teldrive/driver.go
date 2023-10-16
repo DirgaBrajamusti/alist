@@ -43,12 +43,19 @@ func (d *Teldrive) Drop(ctx context.Context) error {
 }
 
 func (d *Teldrive) List(ctx context.Context, dir model.Obj, args model.ListArgs) ([]model.Obj, error) {
+
 	url := d.Addition.Address + "/api/files?order=asc&path="
 	if dirPath := dir.GetPath(); dirPath == "" {
 		url += d.GetRootPath()
 	} else {
+		dirPath, err := d.sanitizeHTMLURL(dirPath)
+		if err != nil {
+			return nil, err
+		}
 		url += dirPath
 	}
+
+	utils.Log.Info(url)
 	client := resty.New()
 
 	client.SetHeader("Cookie", "user-session="+d.Addition.Cookies)
