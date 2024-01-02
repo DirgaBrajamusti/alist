@@ -7,9 +7,9 @@ require (
 	github.com/Xhofe/go-cache v0.0.0-20220723083548-714439c8af9a
 	github.com/Xhofe/rateg v0.0.0-20230728072201-251a4e1adad4
 	github.com/Xhofe/wopan-sdk-go v0.1.2
-	github.com/aliyun/aliyun-oss-go-sdk v2.2.9+incompatible
+	github.com/aliyun/aliyun-oss-go-sdk v2.2.10+incompatible
 	github.com/avast/retry-go v3.0.0+incompatible
-	github.com/aws/aws-sdk-go v1.46.7
+	github.com/aws/aws-sdk-go v1.49.13
 	github.com/blevesearch/bleve/v2 v2.3.10
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/charmbracelet/bubbles v0.16.1
@@ -18,22 +18,23 @@ require (
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/deckarep/golang-set/v2 v2.3.1
 	github.com/disintegration/imaging v1.6.2
-	github.com/djherbis/times v1.5.0
+	github.com/djherbis/times v1.6.0
+	github.com/dlclark/regexp2 v1.10.0
 	github.com/dustinxie/ecc v0.0.0-20210511000915-959544187564
 	github.com/foxxorcat/mopan-sdk-go v0.1.4
 	github.com/foxxorcat/weiyun-sdk-go v0.1.3
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-resty/resty/v2 v2.9.1
-	github.com/go-webauthn/webauthn v0.8.6
+	github.com/go-resty/resty/v2 v2.10.0
+	github.com/go-webauthn/webauthn v0.9.4
 	github.com/golang-jwt/jwt/v4 v4.5.0
-	github.com/google/uuid v1.3.1
-	github.com/gorilla/websocket v1.5.0
+	github.com/google/uuid v1.4.0
+	github.com/gorilla/websocket v1.5.1
 	github.com/hirochachacha/go-smb2 v1.1.0
 	github.com/ipfs/go-ipfs-api v0.7.0
 	github.com/jlaffaye/ftp v0.2.0
 	github.com/json-iterator/go v1.1.12
-	github.com/maruel/natural v1.1.0
+	github.com/maruel/natural v1.1.1
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/orzogc/fake115uploader v0.3.3-0.20230715111618-58f9eb76f831
 	github.com/pkg/errors v0.9.1
@@ -47,13 +48,15 @@ require (
 	github.com/u2takey/ffmpeg-go v0.5.0
 	github.com/upyun/go-sdk/v3 v3.0.4
 	github.com/winfsp/cgofuse v1.5.1-0.20230130140708-f87f5db493b5
-	golang.org/x/crypto v0.14.0
-	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
+	github.com/xhofe/tache v0.1.1
+	golang.org/x/crypto v0.17.0
+	golang.org/x/exp v0.0.0-20231226003508-02704c960a9b
 	golang.org/x/image v0.11.0
-	golang.org/x/net v0.17.0
+	golang.org/x/net v0.19.0
 	golang.org/x/oauth2 v0.12.0
 	golang.org/x/time v0.3.0
-	google.golang.org/appengine v1.6.7
+	google.golang.org/appengine v1.6.8
+	gopkg.in/ldap.v3 v3.1.0
 	gorm.io/driver/mysql v1.4.7
 	gorm.io/driver/postgres v1.4.8
 	gorm.io/driver/sqlite v1.4.4
@@ -98,7 +101,7 @@ require (
 	github.com/crackcomm/go-gitignore v0.0.0-20170627025303-887ab5e44cc3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
-	github.com/fxamacker/cbor/v2 v2.4.0 // indirect
+	github.com/fxamacker/cbor/v2 v2.5.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/gaoyb7/115drive-webdav v0.1.8 // indirect
 	github.com/geoffgarside/ber v1.1.0 // indirect
@@ -109,9 +112,9 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.14.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
-	github.com/go-webauthn/x v0.1.4 // indirect
+	github.com/go-webauthn/x v0.1.5 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.0 // indirect
 	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
@@ -186,18 +189,18 @@ require (
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xhofe/gsync v0.0.0-20230917091818-2111ceb38a25 // indirect
-	github.com/xhofe/tache v0.1.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
 	go.etcd.io/bbolt v1.3.7 // indirect
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/term v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/term v0.15.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/api v0.134.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230803162519-f966b187b2e5 // indirect
 	google.golang.org/grpc v1.57.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
+	gopkg.in/asn1-ber.v1 v1.0.0-20181015200546-f715ec2f112d // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
