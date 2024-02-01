@@ -65,6 +65,7 @@
     - [x] [夸克网盘](https://pan.quark.cn)
     - [x] [迅雷网盘](https://pan.xunlei.com)
     - [x] [蓝奏云](https://www.lanzou.com/)
+    - [x] [蓝奏云优享版](https://www.ilanzou.com/)
     - [x] [阿里云盘分享](https://www.alipan.com/)
     - [x] [谷歌相册](https://photos.google.com/)
     - [x] [Mega.nz](https://mega.nz)
@@ -73,6 +74,7 @@
     - [x] [115](https://115.com/)
     - [X] Cloudreve
     - [x] [Dropbox](https://www.dropbox.com/)
+    - [x] [飞机盘](https://www.feijipan.com/)
 - [x] 部署方便，开箱即用
 - [x] 文件预览（PDF、markdown、代码、纯文本……）
 - [x] 画廊模式下的图像预览
