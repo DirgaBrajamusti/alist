@@ -3,8 +3,10 @@ package ddrv
 import (
 	"context"
 	"io"
+	"math/rand"
 	"mime/multipart"
 	"net/http"
+	"strings"
 
 	"encoding/json"
 	"time"
@@ -42,7 +44,15 @@ func (d *Ddrv) Drop(ctx context.Context) error {
 }
 
 func (d *Ddrv) List(ctx context.Context, dir model.Obj, args model.ListArgs) ([]model.Obj, error) {
-	url := d.Addition.Address + "/api/directories/" + dir.GetID()
+	var url string
+	if strings.Contains(d.Addition.Address, ",") {
+		urlList := strings.Split(d.Addition.Address, ",")
+		randomIndex := rand.Intn(len(urlList))
+		url = urlList[randomIndex] + "/api/directories/" + dir.GetID()
+	} else {
+
+		url = d.Addition.Address + "/api/directories/" + dir.GetID()
+	}
 
 	client := resty.New()
 	client.SetAuthToken(d.Addition.Token)
@@ -87,13 +97,32 @@ func (d *Ddrv) List(ctx context.Context, dir model.Obj, args model.ListArgs) ([]
 }
 
 func (d *Ddrv) Link(ctx context.Context, file model.Obj, args model.LinkArgs) (*model.Link, error) {
+	var url string
+	if strings.Contains(d.Addition.Address, ",") {
+		urlList := strings.Split(d.Addition.Address, ",")
+		randomIndex := rand.Intn(len(urlList))
+		url = urlList[randomIndex]
+	} else {
+
+		url = d.Addition.Address
+	}
+
 	return &model.Link{
-		URL: d.Addition.Address + "/files/" + file.GetID(),
+		URL: url + "/files/" + file.GetID(),
 	}, nil
 }
 
 func (d *Ddrv) MakeDir(ctx context.Context, parentDir model.Obj, dirName string) error {
-	url := d.Addition.Address + "/api/directories/"
+	var url string
+	if strings.Contains(d.Addition.Address, ",") {
+		urlList := strings.Split(d.Addition.Address, ",")
+		randomIndex := rand.Intn(len(urlList))
+		url = urlList[randomIndex] + "/api/directories/"
+	} else {
+
+		url = d.Addition.Address + "/api/directories/"
+	}
+
 	method := "POST"
 
 	payload := `{"name": "` + dirName + `", "parent": "` + parentDir.GetID() + `"}`
@@ -118,7 +147,16 @@ func (d *Ddrv) MakeDir(ctx context.Context, parentDir model.Obj, dirName string)
 
 func (d *Ddrv) Move(ctx context.Context, srcObj, dstDir model.Obj) error {
 	if srcObj.IsDir() {
-		url := d.Addition.Address + "/api/directories/" + srcObj.GetID()
+		var url string
+		if strings.Contains(d.Addition.Address, ",") {
+			urlList := strings.Split(d.Addition.Address, ",")
+			randomIndex := rand.Intn(len(urlList))
+			url = urlList[randomIndex] + "/api/directories/" + srcObj.GetID()
+		} else {
+
+			url = d.Addition.Address + "/api/directories/" + srcObj.GetID()
+		}
+		// url := d.Addition.Address + "/api/directories/" + srcObj.GetID()
 		method := "PUT"
 
 		payload := `{"name": "` + srcObj.GetName() + `", "parent": "` + dstDir.GetID() + `"}`
@@ -140,7 +178,16 @@ func (d *Ddrv) Move(ctx context.Context, srcObj, dstDir model.Obj) error {
 		utils.Log.Debug(resp.String())
 		return nil
 	} else {
-		url := d.Addition.Address + "/api/directories/" + srcObj.GetPath() + "/files/" + srcObj.GetID()
+		var url string
+		if strings.Contains(d.Addition.Address, ",") {
+			urlList := strings.Split(d.Addition.Address, ",")
+			randomIndex := rand.Intn(len(urlList))
+			url = urlList[randomIndex] + "/api/directories/" + srcObj.GetPath() + "/files/" + srcObj.GetID()
+		} else {
+
+			url = d.Addition.Address + "/api/directories/" + srcObj.GetPath() + "/files/" + srcObj.GetID()
+		}
+		// url := d.Addition.Address + "/api/directories/" + srcObj.GetPath() + "/files/" + srcObj.GetID()
 		method := "PUT"
 
 		payload := `{"name": "` + srcObj.GetName() + `", "parent": "` + dstDir.GetID() + `"}`
@@ -166,7 +213,16 @@ func (d *Ddrv) Move(ctx context.Context, srcObj, dstDir model.Obj) error {
 
 func (d *Ddrv) Rename(ctx context.Context, srcObj model.Obj, newName string) error {
 	if srcObj.IsDir() {
-		url := d.Addition.Address + "/api/directories/" + srcObj.GetID()
+		var url string
+		if strings.Contains(d.Addition.Address, ",") {
+			urlList := strings.Split(d.Addition.Address, ",")
+			randomIndex := rand.Intn(len(urlList))
+			url = urlList[randomIndex] + "/api/directories/" + srcObj.GetID()
+		} else {
+
+			url = d.Addition.Address + "/api/directories/" + srcObj.GetID()
+		}
+		// url := d.Addition.Address + "/api/directories/" + srcObj.GetID()
 		method := "PUT"
 
 		payload := `{"name": "` + newName + `", "parent": "` + srcObj.GetPath() + `"}`
@@ -188,7 +244,16 @@ func (d *Ddrv) Rename(ctx context.Context, srcObj model.Obj, newName string) err
 		utils.Log.Debug(resp.String())
 		return nil
 	} else {
-		url := d.Addition.Address + "/api/directories/" + srcObj.GetPath() + "/files/" + srcObj.GetID()
+		var url string
+		if strings.Contains(d.Addition.Address, ",") {
+			urlList := strings.Split(d.Addition.Address, ",")
+			randomIndex := rand.Intn(len(urlList))
+			url = urlList[randomIndex] + "/api/directories/" + srcObj.GetPath() + "/files/" + srcObj.GetID()
+		} else {
+
+			url = d.Addition.Address + "/api/directories/" + srcObj.GetPath() + "/files/" + srcObj.GetID()
+		}
+		// url := d.Addition.Address + "/api/directories/" + srcObj.GetPath() + "/files/" + srcObj.GetID()
 		method := "PUT"
 
 		payload := `{"name": "` + newName + `", "parent": "` + srcObj.GetPath() + `"}`
@@ -214,13 +279,22 @@ func (d *Ddrv) Rename(ctx context.Context, srcObj model.Obj, newName string) err
 
 func (d *Ddrv) Copy(ctx context.Context, srcObj, dstDir model.Obj) error {
 	// TODO copy obj, optional
-	return errs.NotImplement
+	return errs.NotSupport
 }
 
 func (d *Ddrv) Remove(ctx context.Context, obj model.Obj) error {
 
 	if obj.IsDir() {
-		url := d.Addition.Address + "/api/directories/" + obj.GetID()
+		var url string
+		if strings.Contains(d.Addition.Address, ",") {
+			urlList := strings.Split(d.Addition.Address, ",")
+			randomIndex := rand.Intn(len(urlList))
+			url = urlList[randomIndex] + "/api/directories/" + obj.GetID()
+		} else {
+
+			url = d.Addition.Address + "/api/directories/" + obj.GetID()
+		}
+		// url := d.Addition.Address + "/api/directories/" + obj.GetID()
 		method := "DELETE"
 
 		client := resty.New()
@@ -238,7 +312,16 @@ func (d *Ddrv) Remove(ctx context.Context, obj model.Obj) error {
 		}
 		utils.Log.Debug(resp.String())
 	} else {
-		url := d.Addition.Address + "/api/directories/" + obj.GetPath() + "/files/" + obj.GetID()
+		var url string
+		if strings.Contains(d.Addition.Address, ",") {
+			urlList := strings.Split(d.Addition.Address, ",")
+			randomIndex := rand.Intn(len(urlList))
+			url = urlList[randomIndex] + "/api/directories/" + obj.GetPath() + "/files/" + obj.GetID()
+		} else {
+
+			url = d.Addition.Address + "/api/directories/" + obj.GetPath() + "/files/" + obj.GetID()
+		}
+		// url := d.Addition.Address + "/api/directories/" + obj.GetPath() + "/files/" + obj.GetID()
 		method := "DELETE"
 
 		client := resty.New()
@@ -261,7 +344,16 @@ func (d *Ddrv) Remove(ctx context.Context, obj model.Obj) error {
 
 func (d *Ddrv) Put(ctx context.Context, dstDir model.Obj, stream model.FileStreamer, up driver.UpdateProgress) error {
 	const chunkSize = 20 * 1024 * 1024
-	url := d.Addition.Address + "/api/directories/" + dstDir.GetID() + "/files"
+	var url string
+	if strings.Contains(d.Addition.Address, ",") {
+		urlList := strings.Split(d.Addition.Address, ",")
+		randomIndex := rand.Intn(len(urlList))
+		url = urlList[randomIndex] + "/api/directories/" + dstDir.GetID() + "/files"
+	} else {
+
+		url = d.Addition.Address + "/api/directories/" + dstDir.GetID() + "/files"
+	}
+	// url := d.Addition.Address + "/api/directories/" + dstDir.GetID() + "/files"
 
 	// Create the pipe
 	pr, pw := io.Pipe()
