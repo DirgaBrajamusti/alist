@@ -2,9 +2,7 @@ package ddrv
 
 import (
 	"context"
-	"io"
 	"math/rand"
-	"mime/multipart"
 	"net/http"
 	"strings"
 
@@ -13,6 +11,7 @@ import (
 
 	"errors"
 
+	"github.com/alist-org/alist/v3/drivers/base"
 	"github.com/alist-org/alist/v3/internal/driver"
 	"github.com/alist-org/alist/v3/internal/errs"
 	"github.com/alist-org/alist/v3/internal/model"
@@ -343,7 +342,6 @@ func (d *Ddrv) Remove(ctx context.Context, obj model.Obj) error {
 }
 
 func (d *Ddrv) Put(ctx context.Context, dstDir model.Obj, stream model.FileStreamer, up driver.UpdateProgress) error {
-	const chunkSize = 20 * 1024 * 1024
 	var url string
 	if strings.Contains(d.Addition.Address, ",") {
 		urlList := strings.Split(d.Addition.Address, ",")
@@ -355,63 +353,14 @@ func (d *Ddrv) Put(ctx context.Context, dstDir model.Obj, stream model.FileStrea
 	}
 	// url := d.Addition.Address + "/api/directories/" + dstDir.GetID() + "/files"
 
-	// Create the pipe
-	pr, pw := io.Pipe()
-
-	// Create a new multipart writer
-	bodyWriter := multipart.NewWriter(pw)
-
-	// Create a goroutine to copy the file data to the pipe in chunks
-	go func() {
-		defer pw.Close()
-
-		// Create a new form file field
-		formFile, err := bodyWriter.CreateFormFile("file", stream.GetName())
-		if err != nil {
-			utils.Log.Info(err)
-			return
-		}
-
-		// Read and copy the file data in chunks
-		buffer := make([]byte, chunkSize)
-		for {
-			n, _ := stream.Read(buffer)
-			if n == 0 {
-				break
-			}
-			formFile.Write(buffer[:n])
-		}
-
-		// Close the multipart writer after writing the form data
-		bodyWriter.Close()
-	}()
-
-	// Create a new HTTP request
-	request, err := http.NewRequest("POST", url, pr)
+	res, err := base.RestyClient.R().SetContext(ctx).SetHeader("Authorization", "Bearer "+d.Addition.Token).SetFileReader("file", stream.GetName(), stream).Post(url)
 	if err != nil {
 		return err
 	}
-
-	// Set the Content-Type header to the multipart form data
-	request.Header.Set("Content-Type", bodyWriter.FormDataContentType())
-
-	// Set the Authorization header
-	request.Header.Set("Authorization", "Bearer "+d.Addition.Token)
-
-	// Send the request and get the response
-	client := &http.Client{}
-	response, err := client.Do(request)
-	if err != nil {
-		return err
+	utils.Log.Debug(res.String())
+	if res.StatusCode() != http.StatusOK {
+		return errors.New(res.String())
 	}
-	defer response.Body.Close()
-
-	// Read the response body
-	if response.StatusCode != http.StatusOK {
-		data, _ := io.ReadAll(response.Body)
-		return errors.New(string(data))
-	}
-
 	return nil
 }
 
