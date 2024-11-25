@@ -96,19 +96,25 @@ func (d *Ddrv) List(ctx context.Context, dir model.Obj, args model.ListArgs) ([]
 }
 
 func (d *Ddrv) Link(ctx context.Context, file model.Obj, args model.LinkArgs) (*model.Link, error) {
-	var url string
-	if strings.Contains(d.Addition.Address, ",") {
-		urlList := strings.Split(d.Addition.Address, ",")
-		randomIndex := rand.Intn(len(urlList))
-		url = urlList[randomIndex]
+	if d.Addition.CloudflareWorkers != "" {
+		return &model.Link{
+			URL: d.Addition.CloudflareWorkers + "/" + file.GetID(),
+		}, nil
 	} else {
+		var url string
+		if strings.Contains(d.Addition.Address, ",") {
+			urlList := strings.Split(d.Addition.Address, ",")
+			randomIndex := rand.Intn(len(urlList))
+			url = urlList[randomIndex]
+		} else {
 
-		url = d.Addition.Address
+			url = d.Addition.Address
+		}
+
+		return &model.Link{
+			URL: url + "/files/" + file.GetID(),
+		}, nil
 	}
-
-	return &model.Link{
-		URL: url + "/files/" + file.GetID(),
-	}, nil
 }
 
 func (d *Ddrv) MakeDir(ctx context.Context, parentDir model.Obj, dirName string) error {
@@ -277,7 +283,6 @@ func (d *Ddrv) Rename(ctx context.Context, srcObj model.Obj, newName string) err
 }
 
 func (d *Ddrv) Copy(ctx context.Context, srcObj, dstDir model.Obj) error {
-	// TODO copy obj, optional
 	return errs.NotSupport
 }
 

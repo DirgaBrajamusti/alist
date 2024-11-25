@@ -9,6 +9,7 @@ type Addition struct {
 	// Usually one of two
 	Address string `json:"address" required:"true"`
 	Token   string `json:"Token" required:"true"`
+	CloudflareWorkers string `json:"CloudflareWorkers" required:"true"`
 	driver.RootID
 }
 
