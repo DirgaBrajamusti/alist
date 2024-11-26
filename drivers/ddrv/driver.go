@@ -97,8 +97,14 @@ func (d *Ddrv) List(ctx context.Context, dir model.Obj, args model.ListArgs) ([]
 
 func (d *Ddrv) Link(ctx context.Context, file model.Obj, args model.LinkArgs) (*model.Link, error) {
 	if d.Addition.CloudflareWorkers != "" {
+		url := d.Addition.CloudflareWorkers + "/" + file.GetID()
+		generatedURL, err := GenerateCloudflareWorkersSignedURL(url, d.Addition.Token, 3600)
+		if err != nil {
+			return nil, err
+		}
+
 		return &model.Link{
-			URL: d.Addition.CloudflareWorkers + "/" + file.GetID(),
+			URL: generatedURL,
 		}, nil
 	} else {
 		var url string
