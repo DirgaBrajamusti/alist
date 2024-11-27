@@ -7,9 +7,10 @@ import (
 
 type Addition struct {
 	// Usually one of two
-	Address string `json:"address" required:"true"`
-	Token   string `json:"Token" required:"true"`
-	CloudflareWorkers string `json:"CloudflareWorkers" required:"false"`
+	Address                        string `json:"address" required:"true"`
+	Token                          string `json:"Token" required:"true"`
+	CloudflareWorkers              string `json:"CloudflareWorkers" required:"false"`
+	CloudflareWorkersExpirySeconds string `json:"CloudflareWorkersExpirySeconds" required:"false"`
 	driver.RootID
 }
 

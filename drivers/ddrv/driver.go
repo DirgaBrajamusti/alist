@@ -4,6 +4,7 @@ import (
 	"context"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"encoding/json"
@@ -98,7 +99,13 @@ func (d *Ddrv) List(ctx context.Context, dir model.Obj, args model.ListArgs) ([]
 func (d *Ddrv) Link(ctx context.Context, file model.Obj, args model.LinkArgs) (*model.Link, error) {
 	if d.Addition.CloudflareWorkers != "" {
 		url := d.Addition.CloudflareWorkers + "/" + file.GetID()
-		generatedURL, err := GenerateCloudflareWorkersSignedURL(url, d.Addition.Token, 3600)
+
+		expirySeconds := int64(3600)
+		if d.CloudflareWorkersExpirySeconds != "" {
+			expirySeconds, _ = strconv.ParseInt(d.Addition.CloudflareWorkersExpirySeconds, 10, 64)
+		}
+
+		generatedURL, err := GenerateCloudflareWorkersSignedURL(url, d.Addition.Token, expirySeconds)
 		if err != nil {
 			return nil, err
 		}
