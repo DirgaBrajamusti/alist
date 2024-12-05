@@ -12,7 +12,6 @@ import (
 
 	"errors"
 
-	"github.com/alist-org/alist/v3/drivers/base"
 	"github.com/alist-org/alist/v3/internal/driver"
 	"github.com/alist-org/alist/v3/internal/errs"
 	"github.com/alist-org/alist/v3/internal/model"
@@ -371,13 +370,21 @@ func (d *Ddrv) Put(ctx context.Context, dstDir model.Obj, stream model.FileStrea
 	}
 	// url := d.Addition.Address + "/api/directories/" + dstDir.GetID() + "/files"
 
-	res, err := base.RestyClient.R().SetContext(ctx).SetHeader("Authorization", "Bearer "+d.Addition.Token).SetFileReader("file", stream.GetName(), stream).Post(url)
+	contentType, body := mbody(stream, stream.GetName())
+	req, err := http.NewRequest(http.MethodPost, url, body)
 	if err != nil {
 		return err
 	}
-	utils.Log.Debug(res.String())
-	if res.StatusCode() != http.StatusOK {
-		return errors.New(res.String())
+	req.Header.Add("Content-Type", contentType)
+	req.Header.Add("Authorization", "Bearer "+d.Addition.Token)
+
+	// Here make HTTP call
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return errors.New(resp.Status)
 	}
 	return nil
 }
