@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"encoding/json"
-	"time"
 
 	"errors"
 
@@ -79,7 +78,7 @@ func (d *Ddrv) List(ctx context.Context, dir model.Obj, args model.ListArgs) ([]
 				Path:     item.Parent,
 				Size:     int64(item.Size),
 				IsFolder: false,
-				Modified: time.Now(),
+				Modified: item.MTime,
 			})
 		} else {
 			res = append(res, &model.Object{
@@ -88,7 +87,7 @@ func (d *Ddrv) List(ctx context.Context, dir model.Obj, args model.ListArgs) ([]
 				Path:     item.Parent,
 				Size:     0,
 				IsFolder: true,
-				Modified: time.Now(),
+				Modified: item.MTime,
 			})
 		}
 	}
